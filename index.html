@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Block Shooter Pro+</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  background: radial-gradient(circle at top, #0f2a44, #020617);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:Arial;
+}
+
+canvas{
+  width:100%;
+  max-width:420px;
+  height:100%;
+  max-height:700px;
+  background:#020617;
+  border-radius:20px;
+  box-shadow:0 0 40px rgba(0,255,255,0.4);
+  touch-action:none;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="game" width="360" height="640"></canvas>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+// 🔊 Sounds (unlock on first touch)
+const shootSound = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-short-laser-gun-shot-1670.mp3");
+const hitSound   = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-arcade-mechanical-bling-210.wav");
+
+let soundUnlocked = false;
+
+let score = 0;
+let bullets = [];
+let enemies = [];
+
+let player = {
+  x:165,
+  y:560,
+  size:30,
+  targetX:165
+};
+
+let dragging=false;
+let autoShoot=false;
+
+// 🔓 unlock sound on first touch
+function unlockSound(){
+  if(soundUnlocked) return;
+  shootSound.play().then(()=>{shootSound.pause();});
+  hitSound.play().then(()=>{hitSound.pause();});
+  soundUnlocked = true;
+}
+
+canvas.addEventListener("touchstart", e=>{
+  unlockSound();
+  dragging=true;
+  autoShoot=true;
+  shootLoop();
+});
+
+canvas.addEventListener("touchend", ()=>{
+  dragging=false;
+  autoShoot=false;
+});
+
+canvas.addEventListener("touchmove", e=>{
+  if(!dragging) return;
+  const rect=canvas.getBoundingClientRect();
+  player.targetX = e.touches[0].clientX - rect.left - player.size/2;
+});
+
+// 🔫 auto fire
+function shootLoop(){
+  if(!autoShoot) return;
+  bullets.push({x:player.x+12, y:player.y});
+  if(soundUnlocked){
+    shootSound.currentTime=0;
+    shootSound.play();
+  }
+  setTimeout(shootLoop, 280);
+}
+
+// 👾 enemy spawn with HEALTH
+setInterval(()=>{
+  enemies.push({
+    x:Math.random()*320,
+    y:-30,
+    size:30,
+    hp: 2 + Math.floor(score/10),   // 🔥 MULTI HIT
+    speed:2.5 + score*0.06
+  });
+},800);
+
+// 🎮 game loop
+function update(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // smooth movement
+  player.x += (player.targetX - player.x)*0.15;
+  player.x = Math.max(0, Math.min(canvas.width-player.size, player.x));
+
+  // player
+  ctx.shadowColor="#00f2ff";
+  ctx.shadowBlur=25;
+  ctx.fillStyle="#00e5ff";
+  ctx.fillRect(player.x,player.y,player.size,player.size);
+  ctx.shadowBlur=0;
+
+  // bullets
+  bullets.forEach((b,bi)=>{
+    b.y-=8;
+    ctx.fillStyle="yellow";
+    ctx.fillRect(b.x,b.y,6,14);
+    if(b.y<0) bullets.splice(bi,1);
+  });
+
+  // enemies
+  enemies.forEach((e,ei)=>{
+    e.y+=e.speed;
+
+    // color changes with damage
+    ctx.shadowColor="red";
+    ctx.shadowBlur=20;
+    ctx.fillStyle = e.hp>2 ? "#ff4d6d" : e.hp==2 ? "#ff9f43" : "#ffffff";
+    ctx.fillRect(e.x,e.y,e.size,e.size);
+    ctx.shadowBlur=0;
+
+    // health text
+    ctx.fillStyle="black";
+    ctx.font="14px Arial";
+    ctx.fillText(e.hp, e.x+10, e.y+20);
+
+    bullets.forEach((b,bi)=>{
+      if(
+        b.x < e.x+e.size &&
+        b.x+6 > e.x &&
+        b.y < e.y+e.size &&
+        b.y+14 > e.y
+      ){
+        bullets.splice(bi,1);
+        e.hp--;
+        if(soundUnlocked){
+          hitSound.currentTime=0;
+          hitSound.play();
+        }
+        if(e.hp<=0){
+          enemies.splice(ei,1);
+          score++;
+        }
+      }
+    });
+
+    if(e.y>canvas.height){
+      alert("Game Over\nScore: "+score);
+      location.reload();
+    }
+  });
+
+  // UI
+  ctx.fillStyle="white";
+  ctx.font="20px Arial";
+  ctx.fillText("Score: "+score, 15, 30);
+
+  requestAnimationFrame(update);
+}
+
+update();
+</script>
+</body>
+  </html>
