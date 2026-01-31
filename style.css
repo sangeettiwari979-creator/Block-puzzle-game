@@ -48,3 +48,53 @@ body {
     transform: scale(1.05);
     box-shadow: 0 0 20px #0ff;
                                 }
+body {
+    text-align:center;
+    background: linear-gradient(to bottom, #111, #222);
+    color:white;
+    font-family:sans-serif;
+}
+
+#game-container {
+    width:320px;
+    height:400px;
+    margin:20px auto;
+    background:#333;
+    border-radius:15px;
+    position:relative;
+    overflow:hidden;
+    box-shadow: 0 0 20px rgba(0,255,255,0.5);
+}
+
+.tile {
+    width:70px;
+    height:70px;
+    background: linear-gradient(45deg, #ff6, #f06);
+    color:white;
+    font-size:24px;
+    font-weight:bold;
+    text-align:center;
+    line-height:70px;
+    border-radius:10px;
+    position:absolute;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+#start-btn {
+    padding:12px 25px;
+    font-size:20px;
+    cursor:pointer;
+    margin-top:10px;
+    background: #0ff;
+    color:#111;
+    border:none;
+    border-radius:10px;
+    box-shadow: 0 0 10px #0ff;
+    transition: 0.2s;
+}
+
+#start-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #0ff;
+    }
