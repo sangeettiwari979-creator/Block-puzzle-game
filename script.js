@@ -99,3 +99,27 @@ document.addEventListener("keydown", e => {
     drawBoard();
   }
 });
+let startX = 0;
+let startY = 0;
+
+game.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
+});
+
+game.addEventListener("touchend", e => {
+  let dx = e.changedTouches[0].clientX - startX;
+  let dy = e.changedTouches[0].clientY - startY;
+
+  if (Math.abs(dx) > Math.abs(dy)) {
+    if (dx > 30) moveRight();
+    else if (dx < -30) moveLeft();
+  } else {
+    if (dy > 30) moveDown();
+    else if (dy < -30) moveUp();
+  }
+
+  addNumber();
+  scoreEl.innerText = score;
+  drawBoard();
+});
