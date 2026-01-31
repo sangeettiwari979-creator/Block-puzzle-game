@@ -1,23 +1,12 @@
-#game-container {
-  width: 320px;
-  height: 320px;
-  margin: auto;
-  position: relative;
-  background: #222;
-  border-radius: 12px;
+body {
+  margin: 0;
+  background: #020617;
+  color: white;
+  text-align: center;
+  font-family: sans-serif;
 }
 
-.tile {
-  width: 70px;
-  height: 70px;
-  position: absolute;
-  margin: 5px;
-  border-radius: 10px;
-  font-size: 24px;
-  color: #fff;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: 0.2s;
+#game {
+  margin: auto;
+  width: 360px;
 }
